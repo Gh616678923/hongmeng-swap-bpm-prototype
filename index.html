@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit|ie-comp|ie-stand">
+  <title>工作项执行 - 鸿蒙换机审批</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+      font-size: 12px; color: #333; background: #f4f6f9;
+    }
+    a { text-decoration: none; color: #1a5da8; }
+    ul, li { list-style: none; }
+    input, select, textarea { font-family: inherit; outline: none; }
+
+    /* ========== 窗口标题栏 ========== */
+    .win-bar {
+      height: 34px; background: linear-gradient(#fdfdfd, #e8ecf1);
+      border-bottom: 1px solid #c9d2dd; display: flex; align-items: center;
+      justify-content: space-between; padding: 0 10px;
+    }
+    .win-bar .title { font-size: 13px; color: #333; font-weight: bold; }
+    .win-bar .btns i {
+      display: inline-block; width: 22px; height: 18px; line-height: 18px; text-align: center;
+      border: 1px solid #b8c2cd; background: #f5f7fa; color: #667; font-style: normal;
+      font-size: 11px; cursor: pointer; margin-left: 2px;
+    }
+    .win-bar .btns i:hover { background: #e3e9f0; }
+
+    /* ========== 顶部操作按钮区 ========== */
+    .action-bar {
+      background: #fff; border-bottom: 1px solid #d3dae3; padding: 8px 12px;
+      display: flex; justify-content: flex-end; gap: 8px;
+    }
+    .act-btn {
+      height: 28px; padding: 0 14px; border: 1px solid #b9c4d0; border-radius: 3px;
+      background: linear-gradient(#fdfdfd, #eef1f5); color: #444; cursor: pointer;
+      font-size: 12px; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .act-btn:hover { background: linear-gradient(#ffffff, #e2e8f0); border-color: #8fa3ba; }
+    .act-btn .ico { font-size: 12px; font-weight: bold; }
+    .act-btn.agree .ico { color: #2e9e44; }
+    .act-btn.reject .ico { color: #6b7686; }
+    .act-btn.cancel .ico { color: #e03131; }
+
+    /* ========== 页签 ========== */
+    .tab-strip { background: #fff; padding: 6px 12px 0; display: flex; gap: 3px; }
+    .tab-strip .tab {
+      padding: 7px 18px; background: #3e83c8; color: #fff; font-size: 12px;
+      border: 1px solid #3574b5; border-bottom: none; border-radius: 3px 3px 0 0;
+      cursor: pointer; user-select: none;
+    }
+    .tab-strip .tab:hover { background: #4c90d4; }
+    .tab-strip .tab.cur { background: #fff; color: #1a5da8; font-weight: bold; position: relative; top: 1px; }
+
+    /* ========== 流程单表单区 ========== */
+    .form-panel {
+      background: #fff; border: 1px solid #c9d2dd; border-top: none;
+      margin: 0 0 16px; padding: 14px 12px 18px;
+    }
+    .form-grid { width: 100%; border-collapse: collapse; table-layout: fixed; }
+    .form-grid td {
+      border: 1px solid #dbe3ec; padding: 0; vertical-align: middle; height: 32px;
+    }
+    .form-grid td.lbl {
+      width: 13%; background: #e8f1fb; color: #33475b; text-align: right;
+      padding: 0 10px; white-space: nowrap; font-size: 12px;
+    }
+    .form-grid td.lbl .req { color: #e03131; margin-right: 3px; }
+    .form-grid td.val { width: 37%; padding: 0 6px; }
+    .form-grid td.val .ipt {
+      width: 100%; height: 26px; border: 1px solid #ccd5e0; border-radius: 2px;
+      padding: 0 6px; font-size: 12px; color: #333; background: #fff;
+    }
+    .form-grid td.val .ipt:focus { border-color: #3e83c8; box-shadow: 0 0 0 2px rgba(62,131,200,.12); }
+    .form-grid td.val .ipt[readonly], .form-grid td.val .ipt.ro {
+      background: #f5f7fa; color: #667; border-color: #dde3eb;
+    }
+    .form-grid td.val select.ipt { height: 26px; }
+    .form-grid td.val textarea.ipt { height: 60px; padding: 5px 6px; resize: vertical; }
+    .form-grid td.val .suffix { color: #889; margin-left: 4px; font-size: 11px; }
+    .form-grid td.val .attach a { margin-right: 10px; text-decoration: underline; }
+    .form-grid td.val .attach .pv { color: #1a5da8; cursor: pointer; text-decoration: underline; margin-right: 10px; }
+    .form-grid td.val .attach .size { color: #889; margin-left: 40px; }
+    .form-grid td.val .clear-x { color: #98a3b1; cursor: pointer; margin: 0 4px; font-weight: bold; }
+    .form-grid td.val .more { color: #98a3b1; cursor: pointer; }
+
+    /* 明细表 */
+    .grid-title {
+      margin: 14px 0 0; padding: 6px 10px; background: #e8f1fb; border: 1px solid #dbe3ec;
+      border-bottom: none; font-weight: bold; color: #33475b; font-size: 12px;
+    }
+    .grid-scroll { border: 1px solid #dbe3ec; overflow-x: auto; background: #fff; }
+    table.dtl { width: 100%; border-collapse: collapse; font-size: 12px; min-width: 1180px; }
+    table.dtl th {
+      background: #f2f6fb; color: #33475b; font-weight: 600; padding: 7px 6px;
+      border: 1px solid #dbe3ec; text-align: center; white-space: nowrap;
+    }
+    table.dtl td {
+      padding: 6px 6px; border: 1px solid #dbe3ec; text-align: center; vertical-align: middle;
+      word-break: break-all;
+    }
+    table.dtl tr:hover td { background: #f7fbff; }
+    table.dtl td.sum { background: #e8f1fb; font-weight: bold; color: #33475b; }
+    .alink { color: #1a5da8; cursor: pointer; }
+    .alink:hover { text-decoration: underline; }
+    .upload-done { color: #2e9e44; }
+    .upload-miss { color: #e03131; }
+
+    /* 审批意见 */
+    .opinion-row { margin-top: 14px; border: 1px solid #dbe3ec; display: flex; }
+    .opinion-row .lbl {
+      width: 12%; background: #e8f1fb; color: #33475b; text-align: right;
+      padding: 10px 10px 0 0; border-right: 1px solid #dbe3ec; font-size: 12px;
+    }
+    .opinion-row .val { flex: 1; padding: 8px; }
+    .opinion-row textarea {
+      width: 100%; height: 72px; border: 1px solid #ccd5e0; border-radius: 2px;
+      padding: 6px; font-size: 12px; resize: vertical;
+    }
+    .opinion-row textarea:focus { border-color: #3e83c8; box-shadow: 0 0 0 2px rgba(62,131,200,.12); }
+
+    /* ========== 审批轨迹 ========== */
+    .trace-wrap { padding: 6px 2px; }
+    .trace-item { display: flex; }
+    .trace-item .node { width: 30px; display: flex; flex-direction: column; align-items: center; }
+    .trace-item .node .dot {
+      width: 14px; height: 14px; border-radius: 50%; background: #3e83c8;
+      border: 3px solid #d9e7f6; flex-shrink: 0; margin-top: 2px;
+    }
+    .trace-item .node .line { width: 2px; flex: 1; background: #cdd9e6; margin: 4px 0; }
+    .trace-item .node.pend .dot { background: #fff; border: 3px dashed #b9c4d0; }
+    .trace-item .node.pend .line { background: #e2e8f0; }
+    .trace-item .card {
+      flex: 1; border: 1px solid #dbe3ec; background: #fbfdff; border-radius: 3px;
+      padding: 10px 14px; margin: 0 0 14px 10px;
+    }
+    .trace-item.pend .card { background: #fafafa; color: #889; border-style: dashed; }
+    .trace-item .card .hd { display: flex; justify-content: space-between; margin-bottom: 6px; }
+    .trace-item .card .hd b { color: #1a5da8; }
+    .trace-item.pend .card .hd b { color: #889; }
+    .trace-item .card .hd .tm { color: #889; }
+    .trace-item .card .bd { color: #556; line-height: 20px; }
+    .trace-item .card .bd .res { font-weight: bold; }
+    .trace-item .card .bd .res.ok { color: #2e9e44; }
+    .trace-item .card .bd .res.no { color: #e03131; }
+    .trace-item .card .bd .res.ing { color: #d48806; }
+
+    /* ========== 其他页签 ========== */
+    .pane { display: none; background: #fff; border: 1px solid #c9d2dd; border-top: none; padding: 16px 12px; margin-bottom: 16px; }
+    .pane.show { display: block; }
+    table.op_tbl, table.mon_tbl, table.log_tbl {
+      width: 100%; border-collapse: collapse; font-size: 12px;
+    }
+    table.op_tbl th, table.mon_tbl th, table.log_tbl th {
+      background: #f2f6fb; color: #33475b; padding: 8px 6px; border: 1px solid #dbe3ec; text-align: center;
+    }
+    table.op_tbl td, table.mon_tbl td, table.log_tbl td {
+      padding: 7px 6px; border: 1px solid #dbe3ec; text-align: center;
+    }
+    .pane .hint { color: #889; margin-bottom: 10px; }
+
+    /* 场景切换（原型演示用） */
+    .demo-switch {
+      margin: 10px 12px 0; display: flex; gap: 8px; align-items: center;
+    }
+    .demo-switch span { color: #889; }
+    .demo-switch button {
+      height: 26px; padding: 0 12px; border: 1px solid #b9c4d0; border-radius: 3px;
+      background: #fff; cursor: pointer; font-size: 12px; color: #1a5da8;
+    }
+    .demo-switch button.cur { background: #3e83c8; color: #fff; border-color: #3574b5; }
+
+    /* 提交反馈 */
+    .toast {
+      position: fixed; left: 50%; top: 18%; transform: translateX(-50%);
+      background: #fff; border: 1px solid #3e83c8; color: #1a5da8;
+      padding: 10px 22px; border-radius: 3px; box-shadow: 0 4px 16px rgba(0,0,0,.15);
+      display: none; z-index: 99; font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 窗口标题 -->
+  <div class="win-bar">
+    <span class="title" id="winTitle">工作项执行 - 鸿蒙换机申请审批（HJ20260805001）</span>
+    <span class="btns"><i>□</i><i>✕</i></span>
+  </div>
+
+  <!-- 顶部审批操作 -->
+  <div class="action-bar">
+    <button class="act-btn agree" onclick="doApprove('同意')"><span class="ico">✔</span>同意</button>
+    <button class="act-btn reject" onclick="doApprove('不同意')"><span class="ico">↩</span>不同意</button>
+    <button class="act-btn cancel" onclick="doApprove('取消领取')"><span class="ico">✕</span>取消领取</button>
+  </div>
+
+  <!-- 场景切换（原型演示） -->
+  <div class="demo-switch">
+    <span>原型演示切换：</span>
+    <button id="swNormal" class="cur" onclick="switchScene('normal')">场景A：换机申请审批</button>
+    <button id="swDiff" onclick="switchScene('diff')">场景B：异色异型换机审批</button>
+  </div>
+
+  <!-- 页签 -->
+  <div class="tab-strip">
+    <div class="tab cur" data-pane="paneFlow" onclick="switchTab(this)">流程单</div>
+    <div class="tab" data-pane="paneTrace" onclick="switchTab(this)">审批轨迹</div>
+    <div class="tab" data-pane="paneOpinion" onclick="switchTab(this)">审批意见</div>
+    <div class="tab" data-pane="paneMonitor" onclick="switchTab(this)">流程监控</div>
+    <div class="tab" data-pane="paneLog" onclick="switchTab(this)">操作日志</div>
+  </div>
+
+  <!-- ========== 流程单 ========== -->
+  <div class="form-panel" id="paneFlow">
+    <table class="form-grid">
+      <colgroup><col style="width:13%"><col style="width:37%"><col style="width:13%"><col style="width:37%"></colgroup>
+      <tr>
+        <td class="lbl">所属机构</td>
+        <td class="val"><input class="ipt ro" id="fOrg" readonly></td>
+        <td class="lbl">换机单号</td>
+        <td class="val"><input class="ipt ro" id="fOrderNo" readonly></td>
+      </tr>
+      <tr>
+        <td class="lbl">创建人</td>
+        <td class="val"><input class="ipt ro" id="fCreator" readonly></td>
+        <td class="lbl">全国统一换机单号</td>
+        <td class="val">
+          <input class="ipt ro" id="fUniNo" readonly>
+          <span class="clear-x" title="清空">✕</span><span class="more">…</span>
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">创建时间</td>
+        <td class="val"><input class="ipt ro" id="fCreateTime" readonly></td>
+        <td class="lbl">商城单据状态</td>
+        <td class="val"><input class="ipt ro" id="fMallStatus" readonly></td>
+      </tr>
+      <tr>
+        <td class="lbl">事业部</td>
+        <td class="val"><input class="ipt ro" id="fBu" readonly></td>
+        <td class="lbl">售后类型</td>
+        <td class="val"><input class="ipt ro" id="fAftersaleType" readonly></td>
+      </tr>
+      <tr>
+        <td class="lbl">客户</td>
+        <td class="val"><input class="ipt ro" id="fCustomer" readonly></td>
+        <td class="lbl">门店</td>
+        <td class="val"><input class="ipt ro" id="fStore" readonly></td>
+      </tr>
+      <tr>
+        <td class="lbl">旧机行数</td>
+        <td class="val"><input class="ipt ro" id="fOldRows" readonly></td>
+        <td class="lbl">销售分公司</td>
+        <td class="val"><input class="ipt ro" id="fBranch" readonly></td>
+      </tr>
+      <tr>
+        <td class="lbl"><span class="req">*</span>舆情风险</td>
+        <td class="val">
+          <select class="ipt" id="fRisk">
+            <option value="">请选择</option>
+            <option>无舆情风险</option>
+            <option>存在舆情风险-低</option>
+            <option>存在舆情风险-高</option>
+          </select>
+          <span class="suffix">（审批通过后随审批结果回传商城）</span>
+        </td>
+        <td class="lbl">审批通过后时效要求</td>
+        <td class="val"><input class="ipt ro" value="审批通过后24小时内须补传旧机物流单号，超时未传系统自动取消该行" readonly></td>
+      </tr>
+      <tr>
+        <td class="lbl" style="vertical-align:top; padding-top:8px;">换机说明</td>
+        <td class="val" colspan="3" style="padding:6px;">
+          <textarea class="ipt" id="fRemark" style="height:56px;"></textarea>
+        </td>
+      </tr>
+      <tr>
+        <td class="lbl">附件</td>
+        <td class="val" colspan="3">
+          <div class="attach" style="padding:4px 6px; display:flex; align-items:center;">
+            <a href="javascript:;">凭证.zip</a><span class="pv" onclick="alert('原型：打开附件预览')">预览</span>
+            <span class="size" id="fAttachSize">1.60KB</span>
+          </div>
+        </td>
+      </tr>
+    </table>
+
+    <!-- 旧机入库明细 -->
+    <div class="grid-title">旧机入库明细</div>
+    <div class="grid-scroll">
+      <table class="dtl" id="oldDtl">
+        <thead>
+          <tr>
+            <th style="width:4%;">行号</th>
+            <th style="width:11%;">IMEI1/IMEI2/SN</th>
+            <th style="width:9%;">物料编码</th>
+            <th style="width:11%;">物料描述</th>
+            <th style="width:4%;">品牌</th>
+            <th style="width:6%;">机型</th>
+            <th style="width:4%;">颜色</th>
+            <th style="width:6%;">购机时间</th>
+            <th style="width:6%;">退机时间</th>
+            <th style="width:10%;">退机原因</th>
+            <th style="width:8%;">物流单号</th>
+            <th style="width:12%;">收货地址</th>
+            <th style="width:5%;">凭证</th>
+          </tr>
+        </thead>
+        <tbody id="oldTbody"></tbody>
+        <tfoot>
+          <tr>
+            <td class="sum" colspan="4">总计：</td>
+            <td class="sum" colspan="9" id="oldSum"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- 新机出库明细（场景B显示） -->
+    <div id="diffBlock" style="display:none;">
+      <div class="grid-title">异色异型换机明细（CSC代客修改后提审）</div>
+      <div class="grid-scroll">
+        <table class="dtl" id="diffDtl">
+          <thead>
+            <tr>
+              <th style="width:4%;">行号</th>
+              <th style="width:8%;">换机类型</th>
+              <th style="width:9%;">原物料编码</th>
+              <th style="width:12%;">原物料描述</th>
+              <th style="width:9%;">改后物料编码</th>
+              <th style="width:12%;">改后物料描述</th>
+              <th style="width:4%;">品牌</th>
+              <th style="width:6%;">机型</th>
+              <th style="width:4%;">颜色</th>
+              <th style="width:14%;">修改原因</th>
+              <th style="width:10%;">对应旧机SN</th>
+            </tr>
+          </thead>
+          <tbody id="diffTbody"></tbody>
+        </table>
+      </div>
+      <div class="hint" style="margin-top:8px;">说明：审批通过后商城自动取消原出库单并按改后物料生成新出库单；审批驳回则维持原出库单。</div>
+    </div>
+
+    <!-- 审批意见 -->
+    <div class="opinion-row">
+      <div class="lbl">审批意见：</div>
+      <div class="val">
+        <textarea id="fOpinion" placeholder="同意时请填写结论（如：情况属实，同意换机）；不同意时必须填写驳回原因，驳回原因将回传商城展示给客户。"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== 审批轨迹 ========== -->
+  <div class="pane" id="paneTrace"></div>
+
+  <!-- ========== 审批意见 ========== -->
+  <div class="pane" id="paneOpinion">
+    <div class="hint">历次节点审批意见汇总（含商城端提交时的换机说明）</div>
+    <table class="op_tbl">
+      <thead>
+        <tr><th style="width:16%;">节点</th><th style="width:12%;">审批人</th><th style="width:16%;">审批时间</th><th style="width:10%;">结论</th><th>意见内容</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>提交申请</td><td>张三</td><td>2026-08-05 10:23:11</td><td>—</td><td style="text-align:left;">比亚迪APP无法适配车机，客户申请鸿蒙换机，共2台，明细见流程单。</td></tr>
+        <tr><td>分公司审核</td><td>李经理（北京分公司）</td><td>2026-08-05 14:36:40</td><td style="color:#2e9e44;font-weight:bold;">同意</td><td style="text-align:left;">经核实串码在保且符合鸿蒙换机政策，同意提交。</td></tr>
+        <tr><td>总部审核</td><td>王总监（服务运营部）</td><td>2026-08-06 09:15:02</td><td style="color:#2e9e44;font-weight:bold;">同意</td><td style="text-align:left;">同意，注意舆情风险标记为无。</td></tr>
+        <tr><td>当前节点</td><td>赵主管（鸿蒙换机项目组）</td><td colspan="2" style="color:#d48806;">待处理</td><td style="text-align:left; color:#889;">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========== 流程监控 ========== -->
+  <div class="pane" id="paneMonitor">
+    <div class="hint">流程实例运行信息</div>
+    <table class="mon_tbl">
+      <thead><tr><th style="width:18%;">项目</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>流程名称</td><td style="text-align:left;">鸿蒙换机申请审批流程（TLmall→BPM）</td></tr>
+        <tr><td>流程实例ID</td><td style="text-align:left;">PROC-HMSWAP-20260805-000173</td></tr>
+        <tr><td>流程模板版本</td><td style="text-align:left;">V1.0（2026-08版）</td></tr>
+        <tr><td>发起系统</td><td style="text-align:left;">太力商城（TLmall）</td></tr>
+        <tr><td>发起时间</td><td style="text-align:left;">2026-08-05 10:23:11</td></tr>
+        <tr><td>当前节点</td><td style="text-align:left;">总部审核 → 鸿蒙换机项目组终审</td></tr>
+        <tr><td>已耗时</td><td style="text-align:left;">1天22小时（时效标准：3个工作日）</td></tr>
+        <tr><td>审批结果回传</td><td style="text-align:left;">审批完结后实时回传TLmall（接口2：接收换机单审批结果），携带结论与舆情风险标记</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ========== 操作日志 ========== -->
+  <div class="pane" id="paneLog">
+    <table class="log_tbl">
+      <thead><tr><th style="width:16%;">时间</th><th style="width:12%;">操作人</th><th style="width:14%;">操作</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td>2026-08-05 10:23:11</td><td>TLmall</td><td>流程发起</td><td style="text-align:left;">商城推送换机单HJ20260805001，创建审批流程实例</td></tr>
+        <tr><td>2026-08-05 10:23:12</td><td>系统</td><td>节点流转</td><td style="text-align:left;">流转至「分公司审核」，接收人：李经理（北京分公司）</td></tr>
+        <tr><td>2026-08-05 14:36:40</td><td>李经理</td><td>审批同意</td><td style="text-align:left;">审批通过，流转至「总部审核」</td></tr>
+        <tr><td>2026-08-06 09:15:02</td><td>王总监</td><td>审批同意</td><td style="text-align:left;">审批通过，流转至「鸿蒙换机项目组终审」，接收人：赵主管</td></tr>
+        <tr><td>2026-08-06 09:15:02</td><td>赵主管</td><td>领取工作项</td><td style="text-align:left;">当前审批人领取工作项</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ========== 场景数据 ==========
+    var scenes = {
+      normal: {
+        title: "工作项执行 - 鸿蒙换机申请审批（HJ20260805001）",
+        header: {
+          fOrg: "华为FD事业部-服务运营部", fOrderNo: "HJ20260805001",
+          fCreator: "张三（北京分公司-业务员）", fUniNo: "QGTYHJ-20260805-00241",
+          fCreateTime: "2026-08-05 10:23:11", fMallStatus: "售后中",
+          fBu: "华为FD事业部", fAftersaleType: "鸿蒙换机",
+          fCustomer: "广东FDB（经销商客户）", fStore: "北京体验店A",
+          fOldRows: "2 行", fBranch: "北京分公司", fAttachSize: "1.60KB",
+          fRemark: "客户鸿蒙系统换机申请，旧机2台已寄出，物流单号已填写，请审批。"
+        },
+        oldRows: [
+          { sn: "5XNRJI1294792039", code: "100191029603700", material: "手机.华为.P80U 8+256G 曜金黑", brand: "华为", model: "P80U", color: "黑色", sale: "2026-06-25", ret: "2026-08-01", reason: "比亚迪APP无法适配车机", logi: "SF12345678876", addr: "北京市朝阳区XX路XX号 张三 13812345678", up: "六面照✓ ISRP✓" },
+          { sn: "6H8C938475829HJ2", code: "100191029603701", material: "手机.华为.P80U 8+256G 皓月白", brand: "华为", model: "P80U", color: "白色", sale: "2026-06-25", ret: "2026-08-02", reason: "微信/输入法卡死不可用", logi: "SF11111111111", addr: "北京市朝阳区XX路XX号 张三 13812345678", up: "六面照✓ ISRP✓" }
+        ],
+        diffRows: [],
+        trace: [
+          { node: "提交申请", user: "张三（北京分公司）", time: "2026-08-05 10:23:11", state: "done", result: "", text: "商城提交换机申请，进入BPM审批。" },
+          { node: "分公司审核", user: "李经理（北京分公司）", time: "2026-08-05 14:36:40", state: "done", result: "同意", text: "经核实串码在保且符合鸿蒙换机政策，同意提交。" },
+          { node: "总部审核", user: "王总监（服务运营部）", time: "2026-08-06 09:15:02", state: "done", result: "同意", text: "同意。" },
+          { node: "项目组终审（当前）", user: "赵主管（鸿蒙换机项目组）", time: "待处理", state: "pend", result: "待处理", text: "请核实换机明细与凭证，选择舆情风险标记并出具结论。" }
+        ]
+      },
+      diff: {
+        title: "工作项执行 - 异色异型换机审批（HJ20260800008）",
+        header: {
+          fOrg: "华为FD事业部-服务运营部", fOrderNo: "HJ20260800008",
+          fCreator: "郑十（南京分公司-业务员）", fUniNo: "QGTYHJ-20260801-00187",
+          fCreateTime: "2026-08-01 15:20:33", fMallStatus: "售后中(待确认)",
+          fBu: "华为FD事业部", fAftersaleType: "鸿蒙换机",
+          fCustomer: "江苏FD（经销商客户）", fStore: "南京体验店G",
+          fOldRows: "1 行", fBranch: "南京分公司", fAttachSize: "2.35KB",
+          fRemark: "P80U白色库存不足，经与客户线下沟通同意改换Mate60雅川青，客户将在商城确认，本次提请审批。"
+        },
+        oldRows: [
+          { sn: "6Y7U889900112233", code: "100191029603702", material: "手机.华为.P80U 8+256G 皓月白", brand: "华为", model: "P80U", color: "白色", sale: "2026-07-01", ret: "2026-07-28", reason: "无法登录华为账号", logi: "SF33334444555", addr: "南京市鼓楼区XX路XX号 郑十 13951688888", up: "六面照✓ ISRP✓" }
+        ],
+        diffRows: [
+          { no: 1, type: "异色异型换机", oldCode: "100191029603702", oldMat: "手机.华为.P80U 8+256G 皓月白", newCode: "100191029603703", newMat: "手机.华为.Mate60 12+512G 雅川青", brand: "华为", model: "Mate60", color: "雅川青", reason: "P80U皓月白库存不足，客户同意更换同价位机型", oldSn: "6Y7U889900112233" }
+        ],
+        trace: [
+          { node: "旧机入库完成", user: "TW物流系统", time: "2026-08-03 08:40:05", state: "done", result: "已入库", text: "入库单RK00112233回传商城，自动生成出库单。" },
+          { node: "出库失败-库存不足", user: "TW物流系统", time: "2026-08-03 14:10:22", state: "done", result: "失败", text: "P80U皓月白库存不足，出库失败回传商城。" },
+          { node: "CSC代客修改", user: "孙业务（南京分公司）", time: "2026-08-04 10:02:11", state: "done", result: "已修改", text: "在CSC代客将出库物料改为Mate60雅川青，提请异色异型审批。" },
+          { node: "异色异型审批（当前）", user: "赵主管（鸿蒙换机项目组）", time: "待处理", state: "pend", result: "待处理", text: "审批通过后商城取消原出库单并生成新出库单，客户确认后发运。" }
+        ]
+      }
+    };
+    var curScene = "normal";
+
+    function renderScene(key) {
+      var s = scenes[key];
+      curScene = key;
+      $("#winTitle").textContent = s.title;
+      for (var k in s.header) {
+        var el = document.getElementById(k);
+        if (el) el.value = s.header[k];
+      }
+      // 旧机明细
+      var tb = document.getElementById("oldTbody");
+      tb.innerHTML = s.oldRows.map(function (r, i) {
+        var up = r.up.indexOf("✓") >= 0
+          ? '<span class="upload-done">' + r.up + '</span>'
+          : '<span class="upload-miss">' + r.up + '</span>';
+        return "<tr><td>" + (i + 1) + "</td><td>" + r.sn + "</td><td>" + r.code + "</td><td style=\"text-align:left;\">" + r.material + "</td><td>" + r.brand + "</td><td>" + r.model + "</td><td>" + r.color + "</td><td>" + r.sale + "</td><td>" + r.ret + "</td><td style=\"text-align:left;\">" + r.reason + "</td><td>" + r.logi + "</td><td style=\"text-align:left;\">" + r.addr + "</td><td>" + up + "</td></tr>";
+      }).join("");
+      document.getElementById("oldSum").textContent = s.oldRows.length + " 行";
+      // 异色异型明细
+      var block = document.getElementById("diffBlock");
+      if (s.diffRows.length) {
+        block.style.display = "";
+        var dtb = document.getElementById("diffTbody");
+        dtb.innerHTML = s.diffRows.map(function (r) {
+          return "<tr><td>" + r.no + "</td><td><b style=\"color:#d48806;\">" + r.type + "</b></td><td>" + r.oldCode + "</td><td style=\"text-align:left;\">" + r.oldMat + "</td><td>" + r.newCode + "</td><td style=\"text-align:left;\"><b>" + r.newMat + "</b></td><td>" + r.brand + "</td><td>" + r.model + "</td><td>" + r.color + "</td><td style=\"text-align:left;\">" + r.reason + "</td><td>" + r.oldSn + "</td></tr>";
+        }).join("");
+      } else {
+        block.style.display = "none";
+      }
+      // 轨迹
+      var tr = document.getElementById("paneTrace");
+      tr.innerHTML = '<div class="trace-wrap">' + s.trace.map(function (t, i) {
+        var last = i === s.trace.length - 1;
+        var cls = t.state === "pend" ? "trace-item pend" : "trace-item";
+        var node = '<div class="node' + (t.state === "pend" ? " pend" : "") + '"><div class="dot"></div>' + (last ? "" : '<div class="line"></div>') + '</div>';
+        var resCls = t.result === "同意" || t.result === "已入库" || t.result === "已修改" ? "ok" : (t.result === "失败" ? "no" : "ing");
+        var card = '<div class="card"><div class="hd"><b>' + t.node + '</b><span class="tm">' + t.time + '</span></div><div class="bd">处理人：' + t.user + (t.result ? '　｜　结果：<span class="res ' + resCls + '">' + t.result + '</span>' : '') + '<br>' + t.text + '</div></div>';
+        return '<div class="' + cls + '">' + node + card + '</div>';
+      }).join("") + '</div>';
+      // 按钮
+      document.getElementById("swNormal").className = key === "normal" ? "cur" : "";
+      document.getElementById("swDiff").className = key === "diff" ? "cur" : "";
+      document.getElementById("fRisk").value = "";
+      document.getElementById("fOpinion").value = "";
+    }
+
+    function switchScene(key) { renderScene(key); }
+
+    // ========== 页签 ==========
+    function switchTab(el) {
+      document.querySelectorAll(".tab-strip .tab").forEach(function (t) { t.classList.remove("cur"); });
+      el.classList.add("cur");
+      var id = el.getAttribute("data-pane");
+      document.getElementById("paneFlow").style.display = id === "paneFlow" ? "" : "none";
+      document.querySelectorAll(".pane").forEach(function (p) {
+        p.classList.toggle("show", p.id === id);
+      });
+    }
+
+    // ========== 审批操作 ==========
+    function toast(msg) {
+      var t = document.getElementById("toast");
+      t.textContent = msg;
+      t.style.display = "block";
+      setTimeout(function () { t.style.display = "none"; }, 2400);
+    }
+    function doApprove(action) {
+      var risk = document.getElementById("fRisk").value;
+      var opinion = document.getElementById("fOpinion").value.trim();
+      if (action === "同意") {
+        if (!risk) { toast("请先选择「舆情风险」标记（将随审批结果回传商城）"); return; }
+        if (!opinion) { toast("同意时请填写审批意见"); return; }
+        toast("原型：审批「同意」已提交，结果+舆情风险【" + risk + "】实时回传TLmall，商城单据状态更新为「售后中」");
+      } else if (action === "不同意") {
+        if (!opinion) { toast("不同意时必须填写驳回原因（将回传商城展示给客户）"); return; }
+        toast("原型：审批「不同意」已提交，驳回原因回传TLmall，商城单据状态更新为「审批驳回」");
+      } else {
+        toast("原型：已取消领取，工作项回到待领取池");
+      }
+    }
+
+    function $(id) { return document.getElementById(id); }
+
+    // 初始化
+    renderScene("normal");
+  </script>
+</body>
+
+</html>
