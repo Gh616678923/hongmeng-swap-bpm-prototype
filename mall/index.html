@@ -1716,14 +1716,18 @@
       { title: "创建人", width: 90, get: function () { return getCurrentOrder().creator || ""; } },
       { title: "换机单状态", width: 110, get: function () { return getCurrentOrder().orderStatus || ""; } },
       { title: "行号", width: 50, get: function (d, i) { return i + 1; } },
-      { title: "入库单号", width: 110, get: function (d) { return d.oldInNo || ""; } },
-      { title: "入库状态", width: 80, get: function (d) { return d.oldRowStatus || "新建"; } },
       { title: "IMEI1/IMEI2/SN", width: 150, get: function (d) { return d.sn || ""; } },
       { title: "物料描述", width: 180, get: function (d) { return d.material || ""; } },
+      { title: "换机类型", width: 110, get: function (d) { return getNewRowOfOld(d).type || ""; } },
+      { title: "入库单号", width: 110, get: function (d) { return d.oldInNo || ""; } },
+      { title: "入库状态", width: 80, get: function (d) { return d.oldRowStatus || "新建"; } },
+      { title: "回寄物流单号", width: 130, get: function (d) { return d.logisticsNo || ""; } },
+      { title: "出库单号", width: 130, get: function (d) { return getNewRowOfOld(d).newOutNo || ""; } },
+      { title: "出库状态", width: 100, get: function (d) { return getNewRowOfOld(d).newRowStatus || ""; } },
+      { title: "物流单号", width: 130, get: function (d) { return getNewRowOfOld(d).logisticsNo || ""; } },
       { title: "购机时间", width: 90, get: function (d) { return d.saleDate || ""; } },
       { title: "退机时间", width: 90, get: function (d) { return d.returnDate || ""; } },
       { title: "退机原因", width: 180, get: function (d) { return d.reason || ""; } },
-      { title: "物流单号", width: 120, get: function (d) { return d.logisticsNo || ""; } },
       { title: "收货地址", width: 240, get: function (d) {
           return (d.province || "") + (d.city || "") + (d.district || "") + (d.detail || "") || (d.recvAddr || d.oldShipAddr || "");
         } },
@@ -1735,11 +1739,7 @@
       { title: "颜色", width: 70, get: function (d) { return d.color || ""; } },
       { title: "销售分公司", width: 110, get: function (d) { return d.branch || ""; } },
       { title: "仓库", width: 100, get: function (d) { return d.warehouse || ""; } },
-      { title: "仓库地址", width: 200, get: function (d) { return d.warehouseAddr || ""; } },
-      { title: "换机类型", width: 110, get: function (d) { return getNewRowOfOld(d).type || ""; } },
-      { title: "出库单号", width: 130, get: function (d) { return getNewRowOfOld(d).newOutNo || ""; } },
-      { title: "出库状态", width: 100, get: function (d) { return getNewRowOfOld(d).newRowStatus || ""; } },
-      { title: "物流单号", width: 130, get: function (d) { return getNewRowOfOld(d).logisticsNo2 || getNewRowOfOld(d).logisticsNo || ""; } }
+      { title: "仓库地址", width: 200, get: function (d) { return d.warehouseAddr || ""; } }
     ];
     // 根据旧机行找到对应的新机出库行：优先按「对应单号(商城单号)」匹配，其次按行顺序对齐
     function getNewRowOfOld(d) {
