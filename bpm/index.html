@@ -202,26 +202,26 @@
     <table class="form-grid">
       <colgroup><col style="width:13%"><col style="width:37%"><col style="width:13%"><col style="width:37%"></colgroup>
       <tr>
-        <td class="lbl">所属机构</td>
-        <td class="val"><input class="ipt ro" id="fOrg" readonly></td>
+        <td class="lbl">提单方式</td>
+        <td class="val"><input class="ipt ro" id="fOrderMode" readonly></td>
         <td class="lbl">鸿蒙换机申请单号</td>
         <td class="val"><input class="ipt ro" id="fOrderNo" readonly></td>
       </tr>
       <tr>
-        <td class="lbl">客户</td>
-        <td class="val"><input class="ipt ro" id="fCustomer" readonly></td>
+        <td class="lbl">所属机构</td>
+        <td class="val"><input class="ipt ro" id="fOrg" readonly></td>
         <td class="lbl">单据类型</td>
         <td class="val"><input class="ipt ro" id="fBillType" readonly></td>
       </tr>
       <tr>
-        <td class="lbl">提交人</td>
-        <td class="val"><input class="ipt ro" id="fCreator" readonly></td>
+        <td class="lbl">客户</td>
+        <td class="val"><input class="ipt ro" id="fCustomer" readonly></td>
         <td class="lbl">旧机行数</td>
         <td class="val"><input class="ipt ro" id="fOldRows" readonly></td>
       </tr>
       <tr>
-        <td class="lbl">提交时间</td>
-        <td class="val"><input class="ipt ro" id="fCreateTime" readonly></td>
+        <td class="lbl">提交人</td>
+        <td class="val"><input class="ipt ro" id="fCreator" readonly></td>
         <td class="lbl">附件</td>
         <td class="val">
           <div class="attach" style="padding:4px 0; display:flex; align-items:center;">
@@ -229,6 +229,12 @@
             <span class="size" id="fAttachSize">1.60KB</span>
           </div>
         </td>
+      </tr>
+      <tr>
+        <td class="lbl">提交时间</td>
+        <td class="val"><input class="ipt ro" id="fCreateTime" readonly></td>
+        <td class="lbl"></td>
+        <td class="val"></td>
       </tr>
     </table>
 
@@ -362,7 +368,7 @@
       normal: {
         title: "工作项执行 - 鸿蒙换机申请审批（HJ20260805001）",
         header: {
-          fOrg: "华为FD事业部-服务运营部", fOrderNo: "HJ20260805001",
+          fOrderMode: "自主下单", fOrg: "华为FD事业部-服务运营部", fOrderNo: "HJ20260805001",
           fCreator: "张三（北京分公司-业务员）", fBillType: "鸿蒙换机申请单",
           fCreateTime: "2026-08-05 10:23:11",
           fCustomer: "广东FDB（经销商客户）",
@@ -383,7 +389,7 @@
       diff: {
         title: "工作项执行 - 异色异型换机审批（HJ20260800008）",
         header: {
-          fOrg: "华为FD事业部-服务运营部", fOrderNo: "HJ20260800008",
+          fOrderMode: "代客下单", fOrg: "华为FD事业部-服务运营部", fOrderNo: "HJ20260800008",
           fCreator: "郑十（南京分公司-业务员）", fBillType: "异色异型换机申请单",
           fCreateTime: "2026-08-01 15:20:33",
           fCustomer: "江苏FD（经销商客户）",
