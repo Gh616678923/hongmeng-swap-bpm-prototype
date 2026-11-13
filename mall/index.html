@@ -1727,14 +1727,6 @@
       { title: "收货地址", width: 240, get: function (d) {
           return (d.province || "") + (d.city || "") + (d.district || "") + (d.detail || "") || (d.recvAddr || d.oldShipAddr || "");
         } },
-      { title: "六面照", width: 80, get: function (d) {
-          var faces = sixFaceData[buildSixKey(d)] || {};
-          var cnt = FACE_LIST.filter(function (f) { return faces[f.key]; }).length;
-          return cnt + "/6";
-        } },
-      { title: "ISRP截图", width: 80, get: function (d) { return (d.isrpImg || (d.sn ? "已上传" : "未上传")); } },
-      { title: "审批截图", width: 80, get: function (d) { return (d.approveImg || (d.sn ? "已上传" : "—")); } },
-      { title: "客户", width: 130, get: function (d) { return d.customer || modalCustomer || ""; } },
       { title: "门店", width: 120, get: function (d) { return d.store || ""; } },
       { title: "商城单号", width: 110, get: function (d) { return d.orderNo || ""; } },
       { title: "物料编码", width: 130, get: function (d) { return d.materialCode || d.material || ""; } },
@@ -1777,16 +1769,6 @@
               '</style></head><body>';
 
       html += '<table>';
-      // 标题行
-      html += '<tr><td class="title" colspan="' + colCount + '">鸿蒙换机明细（' +
-              esc(modalOrderNo || "") + '）</td></tr>';
-      // 元信息行
-      html += '<tr>' +
-              '<td class="meta" colspan="7">客户：' + esc(modalCustomer || (modalOldRows[0] && modalOldRows[0].customer) || "—") + '</td>' +
-              '<td class="meta" colspan="7">门店：' + esc((modalOldRows[0] && modalOldRows[0].store) || "—") + '</td>' +
-              '<td class="meta" colspan="7">导出时间：' + esc(nowStr) + '</td>' +
-              '<td class="meta" colspan="' + (colCount - 21) + '">旧机行数：' + modalOldRows.length + '</td>' +
-              '</tr>';
       // 列宽
       html += '<tr style="display:none;">';
       EXPORT_COLS.forEach(function (c) {
