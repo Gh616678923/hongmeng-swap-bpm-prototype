@@ -1701,9 +1701,114 @@
       renderOldRows(true);
       alert("地址导入完成，已导入 " + arr.length + " 条收货信息");
     }
+    // ========== 导出：旧机行维度 Excel ==========
+    var EXPORT_COLS = [
+      { title: "行号", width: 50, get: function (d, i) { return i + 1; } },
+      { title: "入库单号", width: 110, get: function (d) { return d.oldInNo || ""; } },
+      { title: "入库状态", width: 80, get: function (d) { return d.oldRowStatus || "新建"; } },
+      { title: "IMEI1/IMEI2/SN", width: 150, get: function (d) { return d.sn || ""; } },
+      { title: "物料描述", width: 180, get: function (d) { return d.material || ""; } },
+      { title: "购机时间", width: 90, get: function (d) { return d.saleDate || ""; } },
+      { title: "退机时间", width: 90, get: function (d) { return d.returnDate || ""; } },
+      { title: "退机原因", width: 180, get: function (d) { return d.reason || ""; } },
+      { title: "物流单号", width: 120, get: function (d) { return d.logisticsNo || ""; } },
+      { title: "收货地址", width: 240, get: function (d) {
+          return (d.province || "") + (d.city || "") + (d.district || "") + (d.detail || "") || (d.recvAddr || d.oldShipAddr || "");
+        } },
+      { title: "六面照", width: 80, get: function (d) {
+          var faces = sixFaceData[buildSixKey(d)] || {};
+          var cnt = FACE_LIST.filter(function (f) { return faces[f.key]; }).length;
+          return cnt + "/6";
+        } },
+      { title: "ISRP截图", width: 80, get: function (d) { return (d.isrpImg || (d.sn ? "已上传" : "未上传")); } },
+      { title: "审批截图", width: 80, get: function (d) { return (d.approveImg || (d.sn ? "已上传" : "—")); } },
+      { title: "客户", width: 130, get: function (d) { return d.customer || modalCustomer || ""; } },
+      { title: "门店", width: 120, get: function (d) { return d.store || ""; } },
+      { title: "商城单号", width: 110, get: function (d) { return d.orderNo || ""; } },
+      { title: "物料编码", width: 130, get: function (d) { return d.materialCode || d.material || ""; } },
+      { title: "品牌", width: 60, get: function (d) { return d.brand || ""; } },
+      { title: "机型", width: 90, get: function (d) { return d.model || ""; } },
+      { title: "颜色", width: 70, get: function (d) { return d.color || ""; } },
+      { title: "销售分公司", width: 110, get: function (d) { return d.branch || ""; } },
+      { title: "仓库", width: 100, get: function (d) { return d.warehouse || ""; } },
+      { title: "仓库地址", width: 200, get: function (d) { return d.warehouseAddr || ""; } }
+    ];
+
+    function esc(str) {
+      return String(str == null ? "" : str)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
     function exportOldRows() {
       if (!modalOldRows.length) { alert("暂无旧机行数据可导出"); return; }
-      alert("原型：已导出当前换机单旧机明细（" + modalOldRows.length + " 行，Excel）");
+      var colCount = EXPORT_COLS.length;
+      var now = new Date();
+      var pad = function (n) { return n < 10 ? "0" + n : "" + n; };
+      var stamp = now.getFullYear() + pad(now.getMonth() + 1) + pad(now.getDate()) +
+                  pad(now.getHours()) + pad(now.getMinutes()) + pad(now.getSeconds());
+      var nowStr = now.getFullYear() + "-" + pad(now.getMonth() + 1) + "-" + pad(now.getDate()) + " " +
+                   pad(now.getHours()) + ":" + pad(now.getMinutes()) + ":" + pad(now.getSeconds());
+
+      var html = '<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8">';
+      // Excel 打印/网格设置
+      html += '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>' +
+              '<x:Name>鸿蒙换机明细</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>' +
+              '</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->';
+      html += '<style>' +
+              'table{border-collapse:collapse;}' +
+              'td,th{border:0.5pt solid #999999;font-family:"Microsoft YaHei";font-size:10pt;vertical-align:middle;}' +
+              '.title{font-size:14pt;font-weight:bold;text-align:center;}' +
+              '.meta{font-size:10pt;color:#333;border:none;}' +
+              '.hd{background:#F2F2F2;font-weight:bold;text-align:center;white-space:nowrap;}' +
+              '.cell-m{text-align:left;mso-number-format:"\@";}' +
+              '.cell-c{text-align:center;mso-number-format:"\@";}' +
+              '</style></head><body>';
+
+      html += '<table>';
+      // 标题行
+      html += '<tr><td class="title" colspan="' + colCount + '">鸿蒙换机明细（' +
+              esc(modalOrderNo || "") + '）</td></tr>';
+      // 元信息行
+      html += '<tr>' +
+              '<td class="meta" colspan="6">客户：' + esc(modalCustomer || (modalOldRows[0] && modalOldRows[0].customer) || "—") + '</td>' +
+              '<td class="meta" colspan="6">门店：' + esc((modalOldRows[0] && modalOldRows[0].store) || "—") + '</td>' +
+              '<td class="meta" colspan="6">导出时间：' + esc(nowStr) + '</td>' +
+              '<td class="meta" colspan="' + (colCount - 18) + '">旧机行数：' + modalOldRows.length + '</td>' +
+              '</tr>';
+      // 列宽
+      html += '<tr style="display:none;">';
+      EXPORT_COLS.forEach(function (c) {
+        html += '<td width="' + c.width + '"></td>';
+      });
+      html += '</tr>';
+      // 表头
+      html += '<tr>';
+      EXPORT_COLS.forEach(function (c) {
+        html += '<td class="hd">' + esc(c.title) + '</td>';
+      });
+      html += '</tr>';
+      // 数据行
+      modalOldRows.forEach(function (d, i) {
+        html += '<tr>';
+        EXPORT_COLS.forEach(function (c) {
+          var v = c.get(d, i);
+          var isNum = (typeof v === "number");
+          html += '<td class="' + (isNum ? "cell-c" : "cell-m") + '">' + esc(v) + '</td>';
+        });
+        html += '</tr>';
+      });
+      html += '</table></body></html>';
+
+      var blob = new Blob([String.fromCharCode(0xFEFF) + html], { type: "application/vnd.ms-excel;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "鸿蒙换机明细_" + (modalOrderNo || "导出") + "_" + stamp + ".xls";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      alert("已导出旧机行明细（" + modalOldRows.length + " 行）");
     }
     function templateExport() {
       alert("原型：已导出旧机录入模板（Excel），可批量填写后导入");
