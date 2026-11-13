@@ -1702,7 +1702,19 @@
       alert("地址导入完成，已导入 " + arr.length + " 条收货信息");
     }
     // ========== 导出：旧机行维度 Excel ==========
+    // 取当前单据的主单信息（列表数据）
+    function getCurrentOrder() {
+      for (var i = 0; i < listData.length; i++) {
+        if (listData[i].sn === modalOrderNo) return listData[i];
+      }
+      return {};
+    }
     var EXPORT_COLS = [
+      { title: "换机单号", width: 120, get: function () { return modalOrderNo || ""; } },
+      { title: "提单方式", width: 80, get: function () { return getCurrentOrder().orderMode || "自主下单"; } },
+      { title: "创建时间", width: 120, get: function () { return getCurrentOrder().date || ""; } },
+      { title: "创建人", width: 90, get: function () { return getCurrentOrder().creator || ""; } },
+      { title: "换机单状态", width: 110, get: function () { return getCurrentOrder().orderStatus || ""; } },
       { title: "行号", width: 50, get: function (d, i) { return i + 1; } },
       { title: "入库单号", width: 110, get: function (d) { return d.oldInNo || ""; } },
       { title: "入库状态", width: 80, get: function (d) { return d.oldRowStatus || "新建"; } },
@@ -1770,10 +1782,10 @@
               esc(modalOrderNo || "") + '）</td></tr>';
       // 元信息行
       html += '<tr>' +
-              '<td class="meta" colspan="6">客户：' + esc(modalCustomer || (modalOldRows[0] && modalOldRows[0].customer) || "—") + '</td>' +
-              '<td class="meta" colspan="6">门店：' + esc((modalOldRows[0] && modalOldRows[0].store) || "—") + '</td>' +
-              '<td class="meta" colspan="6">导出时间：' + esc(nowStr) + '</td>' +
-              '<td class="meta" colspan="' + (colCount - 18) + '">旧机行数：' + modalOldRows.length + '</td>' +
+              '<td class="meta" colspan="7">客户：' + esc(modalCustomer || (modalOldRows[0] && modalOldRows[0].customer) || "—") + '</td>' +
+              '<td class="meta" colspan="7">门店：' + esc((modalOldRows[0] && modalOldRows[0].store) || "—") + '</td>' +
+              '<td class="meta" colspan="7">导出时间：' + esc(nowStr) + '</td>' +
+              '<td class="meta" colspan="' + (colCount - 21) + '">旧机行数：' + modalOldRows.length + '</td>' +
               '</tr>';
       // 列宽
       html += '<tr style="display:none;">';
