@@ -163,16 +163,6 @@
     }
     .pane .hint { color: #889; margin-bottom: 10px; }
 
-    /* 场景切换（原型演示用） */
-    .demo-switch {
-      margin: 10px 12px 0; display: flex; gap: 8px; align-items: center;
-    }
-    .demo-switch span { color: #889; }
-    .demo-switch button {
-      height: 26px; padding: 0 12px; border: 1px solid #b9c4d0; border-radius: 3px;
-      background: #fff; cursor: pointer; font-size: 12px; color: #1a5da8;
-    }
-    .demo-switch button.cur { background: #3e83c8; color: #fff; border-color: #3574b5; }
 
     /* 提交反馈 */
     .toast {
@@ -198,13 +188,6 @@
     <button class="act-btn cancel" onclick="doApprove('取消领取')"><span class="ico">✕</span>取消领取</button>
   </div>
 
-  <!-- 场景切换（原型演示） -->
-  <div class="demo-switch">
-    <span>原型演示切换：</span>
-    <button id="swNormal" class="cur" onclick="switchScene('normal')">场景A：换机申请审批</button>
-    <button id="swDiff" onclick="switchScene('diff')">场景B：异色异型换机审批</button>
-  </div>
-
   <!-- 页签 -->
   <div class="tab-strip">
     <div class="tab cur" data-pane="paneFlow" onclick="switchTab(this)">流程单</div>
@@ -221,66 +204,27 @@
       <tr>
         <td class="lbl">所属机构</td>
         <td class="val"><input class="ipt ro" id="fOrg" readonly></td>
-        <td class="lbl">换机单号</td>
+        <td class="lbl">鸿蒙换机申请单号</td>
         <td class="val"><input class="ipt ro" id="fOrderNo" readonly></td>
-      </tr>
-      <tr>
-        <td class="lbl">创建人</td>
-        <td class="val"><input class="ipt ro" id="fCreator" readonly></td>
-        <td class="lbl">全国统一换机单号</td>
-        <td class="val">
-          <input class="ipt ro" id="fUniNo" readonly>
-          <span class="clear-x" title="清空">✕</span><span class="more">…</span>
-        </td>
-      </tr>
-      <tr>
-        <td class="lbl">创建时间</td>
-        <td class="val"><input class="ipt ro" id="fCreateTime" readonly></td>
-        <td class="lbl">商城单据状态</td>
-        <td class="val"><input class="ipt ro" id="fMallStatus" readonly></td>
-      </tr>
-      <tr>
-        <td class="lbl">事业部</td>
-        <td class="val"><input class="ipt ro" id="fBu" readonly></td>
-        <td class="lbl">售后类型</td>
-        <td class="val"><input class="ipt ro" id="fAftersaleType" readonly></td>
       </tr>
       <tr>
         <td class="lbl">客户</td>
         <td class="val"><input class="ipt ro" id="fCustomer" readonly></td>
-        <td class="lbl">门店</td>
-        <td class="val"><input class="ipt ro" id="fStore" readonly></td>
+        <td class="lbl">单据类型</td>
+        <td class="val"><input class="ipt ro" id="fBillType" readonly></td>
       </tr>
       <tr>
+        <td class="lbl">提交人</td>
+        <td class="val"><input class="ipt ro" id="fCreator" readonly></td>
         <td class="lbl">旧机行数</td>
         <td class="val"><input class="ipt ro" id="fOldRows" readonly></td>
-        <td class="lbl">销售分公司</td>
-        <td class="val"><input class="ipt ro" id="fBranch" readonly></td>
       </tr>
       <tr>
-        <td class="lbl"><span class="req">*</span>舆情风险</td>
-        <td class="val">
-          <select class="ipt" id="fRisk">
-            <option value="">请选择</option>
-            <option>无舆情风险</option>
-            <option>存在舆情风险-低</option>
-            <option>存在舆情风险-高</option>
-          </select>
-          <span class="suffix">（审批通过后随审批结果回传商城）</span>
-        </td>
-        <td class="lbl">审批通过后时效要求</td>
-        <td class="val"><input class="ipt ro" value="审批通过后24小时内须补传旧机物流单号，超时未传系统自动取消该行" readonly></td>
-      </tr>
-      <tr>
-        <td class="lbl" style="vertical-align:top; padding-top:8px;">换机说明</td>
-        <td class="val" colspan="3" style="padding:6px;">
-          <textarea class="ipt" id="fRemark" style="height:56px;"></textarea>
-        </td>
-      </tr>
-      <tr>
+        <td class="lbl">提交时间</td>
+        <td class="val"><input class="ipt ro" id="fCreateTime" readonly></td>
         <td class="lbl">附件</td>
-        <td class="val" colspan="3">
-          <div class="attach" style="padding:4px 6px; display:flex; align-items:center;">
+        <td class="val">
+          <div class="attach" style="padding:4px 0; display:flex; align-items:center;">
             <a href="javascript:;">凭证.zip</a><span class="pv" onclick="alert('原型：打开附件预览')">预览</span>
             <span class="size" id="fAttachSize">1.60KB</span>
           </div>
@@ -288,32 +232,37 @@
       </tr>
     </table>
 
-    <!-- 旧机入库明细 -->
-    <div class="grid-title">旧机入库明细</div>
+    <!-- 鸿蒙换机明细 -->
+    <div class="grid-title">鸿蒙换机明细</div>
     <div class="grid-scroll">
       <table class="dtl" id="oldDtl">
         <thead>
           <tr>
             <th style="width:4%;">行号</th>
             <th style="width:11%;">IMEI1/IMEI2/SN</th>
-            <th style="width:9%;">物料编码</th>
-            <th style="width:11%;">物料描述</th>
-            <th style="width:4%;">品牌</th>
-            <th style="width:6%;">机型</th>
-            <th style="width:4%;">颜色</th>
+            <th style="width:12%;">物料描述</th>
             <th style="width:6%;">购机时间</th>
             <th style="width:6%;">退机时间</th>
             <th style="width:10%;">退机原因</th>
-            <th style="width:8%;">物流单号</th>
-            <th style="width:12%;">收货地址</th>
-            <th style="width:5%;">凭证</th>
+            <th style="width:6%;">舆情风险</th>
+            <th style="width:13%;">收货地址</th>
+            <th style="width:6%;">六面照</th>
+            <th style="width:6%;">门店</th>
+            <th style="width:8%;">商城单号</th>
+            <th style="width:9%;">物料编码</th>
+            <th style="width:4%;">品牌</th>
+            <th style="width:6%;">机型</th>
+            <th style="width:4%;">颜色</th>
+            <th style="width:6%;">销售分公司</th>
+            <th style="width:6%;">仓库</th>
+            <th style="width:9%;">仓库地址</th>
           </tr>
         </thead>
         <tbody id="oldTbody"></tbody>
         <tfoot>
           <tr>
             <td class="sum" colspan="4">总计：</td>
-            <td class="sum" colspan="9" id="oldSum"></td>
+            <td class="sum" colspan="14" id="oldSum"></td>
           </tr>
         </tfoot>
       </table>
@@ -359,7 +308,7 @@
 
   <!-- ========== 审批意见 ========== -->
   <div class="pane" id="paneOpinion">
-    <div class="hint">历次节点审批意见汇总（含商城端提交时的换机说明）</div>
+    <div class="hint">历次节点审批意见汇总</div>
     <table class="op_tbl">
       <thead>
         <tr><th style="width:16%;">节点</th><th style="width:12%;">审批人</th><th style="width:16%;">审批时间</th><th style="width:10%;">结论</th><th>意见内容</th></tr>
@@ -414,16 +363,14 @@
         title: "工作项执行 - 鸿蒙换机申请审批（HJ20260805001）",
         header: {
           fOrg: "华为FD事业部-服务运营部", fOrderNo: "HJ20260805001",
-          fCreator: "张三（北京分公司-业务员）", fUniNo: "QGTYHJ-20260805-00241",
-          fCreateTime: "2026-08-05 10:23:11", fMallStatus: "售后中",
-          fBu: "华为FD事业部", fAftersaleType: "鸿蒙换机",
-          fCustomer: "广东FDB（经销商客户）", fStore: "北京体验店A",
-          fOldRows: "2 行", fBranch: "北京分公司", fAttachSize: "1.60KB",
-          fRemark: "客户鸿蒙系统换机申请，旧机2台已寄出，物流单号已填写，请审批。"
+          fCreator: "张三（北京分公司-业务员）", fBillType: "鸿蒙换机申请单",
+          fCreateTime: "2026-08-05 10:23:11",
+          fCustomer: "广东FDB（经销商客户）",
+          fOldRows: "2 行", fAttachSize: "1.60KB"
         },
         oldRows: [
-          { sn: "5XNRJI1294792039", code: "100191029603700", material: "手机.华为.P80U 8+256G 曜金黑", brand: "华为", model: "P80U", color: "黑色", sale: "2026-06-25", ret: "2026-08-01", reason: "比亚迪APP无法适配车机", logi: "SF12345678876", addr: "北京市朝阳区XX路XX号 张三 13812345678", up: "六面照✓ ISRP✓" },
-          { sn: "6H8C938475829HJ2", code: "100191029603701", material: "手机.华为.P80U 8+256G 皓月白", brand: "华为", model: "P80U", color: "白色", sale: "2026-06-25", ret: "2026-08-02", reason: "微信/输入法卡死不可用", logi: "SF11111111111", addr: "北京市朝阳区XX路XX号 张三 13812345678", up: "六面照✓ ISRP✓" }
+          { sn: "5XNRJI1294792039", isDiff: false, risk: "", store: "北京体验店A", mallNo: "SH20260805001", code: "100191029603700", material: "手机.华为.P80U 8+256G 曜金黑", brand: "华为", model: "P80U", color: "黑色", sale: "2026-06-25", ret: "2026-08-01", reason: "比亚迪APP无法适配车机", logi: "SF12345678876", addr: "北京市朝阳区XX路XX号 张三 13812345678", branch: "北京分公司", warehouse: "北京代管仓", whAddr: "北京市朝阳区XX路XX号", up: "6/6✓" },
+          { sn: "6H8C938475829HJ2", isDiff: false, risk: "低", store: "北京体验店A", mallNo: "SH20260805001", code: "100191029603701", material: "手机.华为.P80U 8+256G 皓月白", brand: "华为", model: "P80U", color: "白色", sale: "2026-06-25", ret: "2026-08-02", reason: "微信/输入法卡死不可用", logi: "SF11111111111", addr: "北京市朝阳区XX路XX号 张三 13812345678", branch: "北京分公司", warehouse: "北京代管仓", whAddr: "北京市朝阳区XX路XX号", up: "6/6✓" }
         ],
         diffRows: [],
         trace: [
@@ -437,15 +384,13 @@
         title: "工作项执行 - 异色异型换机审批（HJ20260800008）",
         header: {
           fOrg: "华为FD事业部-服务运营部", fOrderNo: "HJ20260800008",
-          fCreator: "郑十（南京分公司-业务员）", fUniNo: "QGTYHJ-20260801-00187",
-          fCreateTime: "2026-08-01 15:20:33", fMallStatus: "售后中(待确认)",
-          fBu: "华为FD事业部", fAftersaleType: "鸿蒙换机",
-          fCustomer: "江苏FD（经销商客户）", fStore: "南京体验店G",
-          fOldRows: "1 行", fBranch: "南京分公司", fAttachSize: "2.35KB",
-          fRemark: "P80U白色库存不足，经与客户线下沟通同意改换Mate60雅川青，客户将在商城确认，本次提请审批。"
+          fCreator: "郑十（南京分公司-业务员）", fBillType: "异色异型换机申请单",
+          fCreateTime: "2026-08-01 15:20:33",
+          fCustomer: "江苏FD（经销商客户）",
+          fOldRows: "1 行", fAttachSize: "2.35KB"
         },
         oldRows: [
-          { sn: "6Y7U889900112233", code: "100191029603702", material: "手机.华为.P80U 8+256G 皓月白", brand: "华为", model: "P80U", color: "白色", sale: "2026-07-01", ret: "2026-07-28", reason: "无法登录华为账号", logi: "SF33334444555", addr: "南京市鼓楼区XX路XX号 郑十 13951688888", up: "六面照✓ ISRP✓" }
+          { sn: "6Y7U889900112233", isDiff: true, risk: "", store: "南京体验店G", mallNo: "SH20260800008", code: "100191029603702", material: "手机.华为.P80U 8+256G 皓月白", brand: "华为", model: "P80U", color: "白色", sale: "2026-07-01", ret: "2026-07-28", reason: "无法登录华为账号", logi: "SF33334444555", addr: "南京市鼓楼区XX路XX号 郑十 13951688888", branch: "南京分公司", warehouse: "南京代管仓", whAddr: "南京市鼓楼区XX路XX号", up: "6/6✓" }
         ],
         diffRows: [
           { no: 1, type: "异色异型换机", oldCode: "100191029603702", oldMat: "手机.华为.P80U 8+256G 皓月白", newCode: "100191029603703", newMat: "手机.华为.Mate60 12+512G 雅川青", brand: "华为", model: "Mate60", color: "雅川青", reason: "P80U皓月白库存不足，客户同意更换同价位机型", oldSn: "6Y7U889900112233" }
@@ -474,7 +419,27 @@
         var up = r.up.indexOf("✓") >= 0
           ? '<span class="upload-done">' + r.up + '</span>'
           : '<span class="upload-miss">' + r.up + '</span>';
-        return "<tr><td>" + (i + 1) + "</td><td>" + r.sn + "</td><td>" + r.code + "</td><td style=\"text-align:left;\">" + r.material + "</td><td>" + r.brand + "</td><td>" + r.model + "</td><td>" + r.color + "</td><td>" + r.sale + "</td><td>" + r.ret + "</td><td style=\"text-align:left;\">" + r.reason + "</td><td>" + r.logi + "</td><td style=\"text-align:left;\">" + r.addr + "</td><td>" + up + "</td></tr>";
+        var risk = r.risk ? '<span style="color:#e03131;">' + r.risk + '</span>' : '无';
+        return "<tr>" +
+          "<td>" + (i + 1) + "</td>" +
+          "<td>" + r.sn + "</td>" +
+          "<td style=\"text-align:left;\">" + r.material + "</td>" +
+          "<td>" + r.sale + "</td>" +
+          "<td>" + r.ret + "</td>" +
+          "<td style=\"text-align:left;\">" + r.reason + "</td>" +
+          "<td>" + risk + "</td>" +
+          "<td style=\"text-align:left;\">" + r.addr + "</td>" +
+          "<td>" + up + "</td>" +
+          "<td>" + (r.store || "—") + "</td>" +
+          "<td>" + (r.mallNo || "—") + "</td>" +
+          "<td>" + r.code + "</td>" +
+          "<td>" + r.brand + "</td>" +
+          "<td>" + r.model + "</td>" +
+          "<td>" + r.color + "</td>" +
+          "<td>" + (r.branch || "—") + "</td>" +
+          "<td>" + (r.warehouse || "—") + "</td>" +
+          "<td style=\"text-align:left;\">" + (r.whAddr || "—") + "</td>" +
+          "</tr>";
       }).join("");
       document.getElementById("oldSum").textContent = s.oldRows.length + " 行";
       // 异色异型明细
@@ -499,9 +464,6 @@
         return '<div class="' + cls + '">' + node + card + '</div>';
       }).join("") + '</div>';
       // 按钮
-      document.getElementById("swNormal").className = key === "normal" ? "cur" : "";
-      document.getElementById("swDiff").className = key === "diff" ? "cur" : "";
-      document.getElementById("fRisk").value = "";
       document.getElementById("fOpinion").value = "";
     }
 
@@ -526,12 +488,10 @@
       setTimeout(function () { t.style.display = "none"; }, 2400);
     }
     function doApprove(action) {
-      var risk = document.getElementById("fRisk").value;
       var opinion = document.getElementById("fOpinion").value.trim();
       if (action === "同意") {
-        if (!risk) { toast("请先选择「舆情风险」标记（将随审批结果回传商城）"); return; }
         if (!opinion) { toast("同意时请填写审批意见"); return; }
-        toast("原型：审批「同意」已提交，结果+舆情风险【" + risk + "】实时回传TLmall，商城单据状态更新为「售后中」");
+        toast("原型：审批「同意」已提交，结果实时回传TLmall，商城单据状态更新为「售后中」");
       } else if (action === "不同意") {
         if (!opinion) { toast("不同意时必须填写驳回原因（将回传商城展示给客户）"); return; }
         toast("原型：审批「不同意」已提交，驳回原因回传TLmall，商城单据状态更新为「审批驳回」");
