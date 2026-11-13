@@ -1735,8 +1735,25 @@
       { title: "颜色", width: 70, get: function (d) { return d.color || ""; } },
       { title: "销售分公司", width: 110, get: function (d) { return d.branch || ""; } },
       { title: "仓库", width: 100, get: function (d) { return d.warehouse || ""; } },
-      { title: "仓库地址", width: 200, get: function (d) { return d.warehouseAddr || ""; } }
+      { title: "仓库地址", width: 200, get: function (d) { return d.warehouseAddr || ""; } },
+      { title: "换机类型", width: 110, get: function (d) { return getNewRowOfOld(d).type || ""; } },
+      { title: "出库单号", width: 130, get: function (d) { return getNewRowOfOld(d).newOutNo || ""; } },
+      { title: "出库状态", width: 100, get: function (d) { return getNewRowOfOld(d).newRowStatus || ""; } },
+      { title: "物流单号", width: 130, get: function (d) { return getNewRowOfOld(d).logisticsNo2 || getNewRowOfOld(d).logisticsNo || ""; } }
     ];
+    // 根据旧机行找到对应的新机出库行：优先按「对应单号(商城单号)」匹配，其次按行顺序对齐
+    function getNewRowOfOld(d) {
+      var rows = (newRowsData[modalOrderNo] || []).filter(function (r) { return !r.isReplaced; });
+      if (!rows.length) return {};
+      if (d.orderNo) {
+        for (var i = 0; i < rows.length; i++) {
+          if (rows[i].oldOrderNo === d.orderNo) return rows[i];
+        }
+      }
+      var idx = modalOldRows.indexOf(d);
+      if (idx < 0) idx = 0;
+      return rows[Math.min(idx, rows.length - 1)] || {};
+    }
 
     function esc(str) {
       return String(str == null ? "" : str)
