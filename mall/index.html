@@ -617,7 +617,8 @@
                 <table class="bs_table" id="listTable">
                   <thead>
                     <tr>
-                      <th style="width:17%;">换机单号</th>
+                      <th style="width:16%;">换机单号</th>
+                      <th style="width:10%;">提单方式</th>
                       <th style="width:13%;">创建时间</th>
                       <th style="width:11%;">创建人</th>
                       <th style="width:9%;">旧机行数</th>
@@ -843,20 +844,20 @@
     // ========== 列表数据（按售后单头维度） ==========
     // 每个售后单一行，oldRowCount=旧机行数，oldStatusSummary/newStatusSummary=状态汇总
     var listData = [
-      { sn: "SH20260805001", creator: "张三", customer: "张三", store: "北京体验店A", branch: "北京分公司", oldRowCount: 2, oldStatusSummary: ["已入库","已审核"], newStatusSummary: ["取消","待确认"], orderStatus: "售后中(待确认)", date: "2026-08-01 10:23" },
-      { sn: "SH20260805002", creator: "李四", customer: "李四", store: "北京体验店A", branch: "北京分公司", oldRowCount: 1, oldStatusSummary: ["待审核"], newStatusSummary: ["待生成"], orderStatus: "售后中", date: "2026-08-02 14:05" },
-      { sn: "SH20260804003", creator: "王五", customer: "王五", store: "上海门店B", branch: "上海分公司", oldRowCount: 1, oldStatusSummary: ["审批驳回"], newStatusSummary: ["待生成"], orderStatus: "审批驳回", rejectReason: "退机原因不明确，请补充说明", date: "2026-08-02 14:05" },
-      { sn: "SH20260803004", creator: "赵六", customer: "赵六", store: "广州门店C", branch: "广州分公司", oldRowCount: 5, oldStatusSummary: ["新建","新建","新建","新建","新建"], newStatusSummary: ["待生成"], orderStatus: "新建", date: "2026-08-03 09:18" },
-      { sn: "SH20260803005", creator: "孙七", customer: "孙七", store: "深圳门店D", branch: "深圳分公司", oldRowCount: 1, oldStatusSummary: ["新建"], newStatusSummary: ["待生成"], orderStatus: "新建", date: "2026-08-04 16:42" },
-      { sn: "SH20260802006", creator: "周八", customer: "周八", store: "成都体验店E", branch: "成都分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待出库"], orderStatus: "售后中", date: "2026-08-04 11:30" },
-      { sn: "SH20260801007", creator: "吴九", customer: "吴九", store: "武汉门店F", branch: "武汉分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["已出库"], orderStatus: "已完成", date: "2026-08-05 08:15" },
-      { sn: "SH20260800008", creator: "郑十", customer: "郑十", store: "南京体验店G", branch: "南京分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待BPM审批"], orderStatus: "售后中", date: "2026-08-05 15:20" },
-      { sn: "SH20260790009", creator: "钱十一", customer: "钱十一", store: "杭州体验店H", branch: "杭州分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待出库"], orderStatus: "售后中", date: "2026-08-05 16:30" },
-      { sn: "SH20260790010", creator: "冯十二", customer: "冯十二", store: "重庆门店I", branch: "重庆分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待出库"], orderStatus: "售后中", date: "2026-08-06 09:10" },
-      { sn: "SH20260790011", creator: "陈十三", customer: "陈十三", store: "西安体验店J", branch: "西安分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待出库"], orderStatus: "售后中", date: "2026-08-06 10:45" },
-      { sn: "SH20260790012", creator: "褚十四", customer: "褚十四", store: "苏州门店K", branch: "苏州分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待BPM审批"], orderStatus: "售后中", date: "2026-08-06 11:20" },
-      { sn: "SH20260790013", creator: "卫十五", customer: "卫十五", store: "天津体验店L", branch: "天津分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待出库"], orderStatus: "售后中", date: "2026-08-06 14:00" },
-      { sn: "SH20260790014", creator: "蒋十六", customer: "蒋十六", store: "青岛门店M", branch: "青岛分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待BPM审批"], orderStatus: "售后中", date: "2026-08-06 15:30" }
+      { sn: "SH20260805001", orderMode: "自主下单", creator: "张三", customer: "张三", store: "北京体验店A", branch: "北京分公司", oldRowCount: 2, oldStatusSummary: ["已入库","已审核"], newStatusSummary: ["取消","待确认"], orderStatus: "售后中(待确认)", date: "2026-08-01 10:23" },
+      { sn: "SH20260805002", orderMode: "自主下单", creator: "李四", customer: "李四", store: "北京体验店A", branch: "北京分公司", oldRowCount: 1, oldStatusSummary: ["待审核"], newStatusSummary: ["待生成"], orderStatus: "售后中", date: "2026-08-02 14:05" },
+      { sn: "SH20260804003", orderMode: "代客下单", creator: "王五", customer: "王五", store: "上海门店B", branch: "上海分公司", oldRowCount: 1, oldStatusSummary: ["审批驳回"], newStatusSummary: ["待生成"], orderStatus: "审批驳回", rejectReason: "退机原因不明确，请补充说明", date: "2026-08-02 14:05" },
+      { sn: "SH20260803004", orderMode: "自主下单", creator: "赵六", customer: "赵六", store: "广州门店C", branch: "广州分公司", oldRowCount: 5, oldStatusSummary: ["新建","新建","新建","新建","新建"], newStatusSummary: ["待生成"], orderStatus: "新建", date: "2026-08-03 09:18" },
+      { sn: "SH20260803005", orderMode: "自主下单", creator: "孙七", customer: "孙七", store: "深圳门店D", branch: "深圳分公司", oldRowCount: 1, oldStatusSummary: ["新建"], newStatusSummary: ["待生成"], orderStatus: "新建", date: "2026-08-04 16:42" },
+      { sn: "SH20260802006", orderMode: "自主下单", creator: "周八", customer: "周八", store: "成都体验店E", branch: "成都分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待出库"], orderStatus: "售后中", date: "2026-08-04 11:30" },
+      { sn: "SH20260801007", orderMode: "自主下单", creator: "吴九", customer: "吴九", store: "武汉门店F", branch: "武汉分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["已出库"], orderStatus: "已完成", date: "2026-08-05 08:15" },
+      { sn: "SH20260800008", orderMode: "代客下单", creator: "郑十", customer: "郑十", store: "南京体验店G", branch: "南京分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待BPM审批"], orderStatus: "售后中", date: "2026-08-05 15:20" },
+      { sn: "SH20260790009", orderMode: "自主下单", creator: "钱十一", customer: "钱十一", store: "杭州体验店H", branch: "杭州分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待出库"], orderStatus: "售后中", date: "2026-08-05 16:30" },
+      { sn: "SH20260790010", orderMode: "自主下单", creator: "冯十二", customer: "冯十二", store: "重庆门店I", branch: "重庆分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待出库"], orderStatus: "售后中", date: "2026-08-06 09:10" },
+      { sn: "SH20260790011", orderMode: "自主下单", creator: "陈十三", customer: "陈十三", store: "西安体验店J", branch: "西安分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待出库"], orderStatus: "售后中", date: "2026-08-06 10:45" },
+      { sn: "SH20260790012", orderMode: "代客下单", creator: "褚十四", customer: "褚十四", store: "苏州门店K", branch: "苏州分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待BPM审批"], orderStatus: "售后中", date: "2026-08-06 11:20" },
+      { sn: "SH20260790013", orderMode: "自主下单", creator: "卫十五", customer: "卫十五", store: "天津体验店L", branch: "天津分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待出库"], orderStatus: "售后中", date: "2026-08-06 14:00" },
+      { sn: "SH20260790014", orderMode: "代客下单", creator: "蒋十六", customer: "蒋十六", store: "青岛门店M", branch: "青岛分公司", oldRowCount: 1, oldStatusSummary: ["已入库"], newStatusSummary: ["待BPM审批"], orderStatus: "售后中", date: "2026-08-06 15:30" }
     ];
     function renderList() {
       var $tb = $("#listTbody");
@@ -864,6 +865,7 @@
       listData.forEach(function (r, i) {
         $tb.append('<tr class="main-row" data-idx="' + i + '">' +
           '<td><a class="alink" onclick="openModal(\'view\',' + i + ')">' + r.sn + '</a>' + buildTypeBadge(r.sn) + '</td>' +
+          '<td>' + (r.orderMode || "自主下单") + '</td>' +
           '<td>' + r.date + '</td>' +
           '<td>' + (r.creator || "—") + '</td>' +
           '<td>' + r.oldRowCount + '</td>' +
@@ -1023,7 +1025,7 @@
       var src = listData[i];
       var newSn = "SH" + new Date().getFullYear() + String(new Date().getMonth() + 1).padStart(2, "0") + String(new Date().getDate()).padStart(2, "0") + String(Math.floor(Math.random() * 900) + 100);
       var copy = {
-        sn: newSn, creator: "测试客户", customer: src.customer, store: src.store, branch: src.branch, oldRowCount: src.oldRowCount,
+        sn: newSn, orderMode: src.orderMode || "自主下单", creator: "测试客户", customer: src.customer, store: src.store, branch: src.branch, oldRowCount: src.oldRowCount,
         oldStatusSummary: ["新建"], newStatusSummary: ["待生成"], orderStatus: "待审批",
         date: new Date().toISOString().slice(0, 10) + " " + new Date().toTimeString().slice(0, 5)
       };
@@ -1505,7 +1507,7 @@
                   '<th style="min-width:100px;">上传凭证</th>' +
                   '<th style="min-width:60px;">客户</th>' +
                   '<th style="min-width:60px;">门店</th>' +
-                  '<th style="min-width:80px;">对应单号</th>' +
+                  '<th style="min-width:80px;">商城单号</th>' +
                   '<th style="min-width:90px;">物料编码</th>' +
                   '<th style="min-width:45px;">品牌</th>' +
                   '<th style="min-width:70px;">机型</th>' +
