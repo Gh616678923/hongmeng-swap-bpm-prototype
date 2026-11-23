@@ -1480,8 +1480,6 @@
       var hasInstored = modalOldRows.some(function (r) { return r.oldRowStatus == "已入库"; });
       var newToolbar = hasInstored
         ? '<div class="modal-table-toolbar">' +
-            '<button class="btn btn-bg01" id="btnSubmitBPM" onclick="submitBPM()" style="display:none;">提交BPM审批</button>' +
-            '<button class="btn btn-bg01" id="btnBatchOut" onclick="batchOutbound()">批量出库</button>' +
             '<span style="color:#999;font-size:12px;">换机类型：正常换机 / 异色异型换机（改颜色/型号）｜ 异色异型换机需确认后方可出库</span>' +
           '</div>'
         : '<div class="modal-table-toolbar"></div>';
