@@ -929,11 +929,12 @@
       html += '<div class="sub-section"><div class="sub-sec-title">旧机入库明细（' + oldRows.length + '）</div>';
       if (oldRows.length) {
         html += '<table class="sub_table"><thead><tr>' +
-          '<th>物料描述</th><th>入库行状态</th><th>退机原因</th><th>物流单号</th>' +
+          '<th>物料描述</th><th>项目</th><th>入库行状态</th><th>退机原因</th><th>物流单号</th>' +
           '</tr></thead><tbody>';
         oldRows.slice(0, maxShow).forEach(function (o) {
           html += '<tr>' +
             '<td>' + (o.material || '—') + '</td>' +
+            '<td>' + (o.project || '—') + '</td>' +
             '<td><span class="row-status ' + rowStatusMap[o.oldRowStatus] + '">' + o.oldRowStatus + '</span></td>' +
             '<td>' + (o.reason || '—') + '</td>' +
             '<td>' + (o.logisticsNo || '—') + '</td>' +
@@ -1164,6 +1165,7 @@
         '<td><span class="row-status ' + rowStatusMap[st] + '">' + st + '</span></td>' +
         '<td>' + snCell + '</td>' +
         '<td><input class="cell-ipt auto" value="' + (d.material || "") + '" readonly></td>' +
+        '<td><input class="cell-ipt auto" value="' + (d.project || "") + '" placeholder="项目" readonly></td>' +
         '<td><input class="cell-ipt" value="' + (d.saleDate || "") + '" placeholder="购机时间" ' + ro + '></td>' +
         '<td><input class="cell-ipt" value="' + (d.returnDate || "") + '" placeholder="退机时间" ' + ro + '></td>' +
         '<td><input class="cell-ipt" value="' + (d.reason || "") + '" placeholder="退机原因" ' + ro + '></td>' +
@@ -1187,7 +1189,7 @@
       var $tb = $("#oldTbody");
       $tb.empty();
       if (!modalOldRows.length) {
-        $tb.html('<tr class="empty-row"><td colspan="21">暂无旧机数据，请点击「新增旧件行」或「上传图片识别」或「地址导入」</td></tr>');
+        $tb.html('<tr class="empty-row"><td colspan="22">暂无旧机数据，请点击「新增旧件行」或「上传图片识别」或「地址导入」</td></tr>');
         return;
       }
       modalOldRows.forEach(function (r, i) { $tb.append(buildOldRow(r, editable, i)); });
@@ -1500,6 +1502,7 @@
                   '<th style="min-width:50px;">入库行状态</th>' +
                   '<th style="min-width:130px;">IMEI1/IMEI2/SN</th>' +
                   '<th style="min-width:60px;">物料描述</th>' +
+                  '<th style="min-width:90px;">项目</th>' +
                   '<th style="min-width:80px;">购机时间<sup style="color:#FA1708">*</sup></th>' +
                   '<th style="min-width:80px;">退机时间<sup style="color:#FA1708">*</sup></th>' +
                   '<th style="min-width:100px;">退机原因<sup style="color:#FA1708">*</sup></th>' +
@@ -1568,7 +1571,7 @@
         title = "新增换机单";
         modalOrderNo = "SH" + new Date().getFullYear() + String(new Date().getMonth() + 1).padStart(2, "0") + String(new Date().getDate()).padStart(2, "0") + String(Math.floor(Math.random() * 900) + 100);
         modalCustomer = "";
-        modalOldRows = [{ sn: "", orderNo: "", store: "", reason: "", saleDate: "", returnDate: "", isDiffSwap: "否", oldShipAddr: "XX路XX号", newRecvAddr: "XX路XX号", isDiffSwap: "否", logisticsNo: "", brand: "华为", model: "", color: "", warehouse: "XX代管仓", warehouseAddr: "XX路XX号", branch: "", material: "", oldInNo: "", oldRowStatus: "新建" }];
+        modalOldRows = [{ sn: "", orderNo: "", store: "", reason: "", saleDate: "", returnDate: "", isDiffSwap: "否", oldShipAddr: "XX路XX号", newRecvAddr: "XX路XX号", isDiffSwap: "否", logisticsNo: "", brand: "华为", model: "", color: "", warehouse: "XX代管仓", warehouseAddr: "XX路XX号", branch: "", material: "", project: "", oldInNo: "", oldRowStatus: "新建" }];
       } else {
         var r = listData[listIndex];
         modalOrderNo = r.sn;
@@ -1615,7 +1618,7 @@
 
     // ========== 弹窗内操作 ==========
     function addOldRow() {
-      modalOldRows.push({ sn: "", recvAddr: "", oldInNo: "", customer: "", store: "", reason: "", saleDate: "", returnDate: "", logisticsNo: "", orderNo: "", brand: "华为", model: "", color: "", branch: "", material: "", warehouse: "XX代管仓", warehouseAddr: "XX路XX号", oldRowStatus: "新建" });
+      modalOldRows.push({ sn: "", recvAddr: "", oldInNo: "", customer: "", store: "", reason: "", saleDate: "", returnDate: "", logisticsNo: "", orderNo: "", brand: "华为", model: "", color: "", branch: "", material: "", project: "", warehouse: "XX代管仓", warehouseAddr: "XX路XX号", oldRowStatus: "新建" });
       renderOldRows(true);
     }
     function clearOldRows() {
@@ -1666,7 +1669,7 @@
       if (!sn) return;
       var arr = sn.split(/[,\n\s]+/).filter(Boolean);
       arr.forEach(function (s) {
-        modalOldRows.push({ sn: s.trim(), brand: "华为", model: "P80U", color: "黑色", warehouse: "XX代管仓", warehouseAddr: "XX路XX号", branch: "北京分公司", material: "P80U 8+256G", oldShipAddr: "北京市朝阳区XX路XX号", newRecvAddr: "北京市朝阳区XX路XX号", oldRowStatus: "新建" });
+        modalOldRows.push({ sn: s.trim(), brand: "华为", model: "P80U", color: "黑色", warehouse: "XX代管仓", warehouseAddr: "XX路XX号", branch: "北京分公司", project: "P80U鸿蒙换机项目", material: "P80U 8+256G", oldShipAddr: "北京市朝阳区XX路XX号", newRecvAddr: "北京市朝阳区XX路XX号", oldRowStatus: "新建" });
       });
       renderOldRows(true);
       alert("已导入 " + arr.length + " 条SN");
@@ -1685,7 +1688,7 @@
       alert("原型：弹出上传图片界面，OCR批量识别串码并自动填入各行。\n（支持识别产品包装条码、*#06#屏幕截图等）");
       var recognized = ["OCR998877665544", "OCR554433221100"];
       recognized.forEach(function (s) {
-        modalOldRows.push({ sn: s, recvAddr: "", oldInNo: "", customer: "", store: "", reason: "", saleDate: "", returnDate: "", logisticsNo: "", orderNo: "", brand: "华为", model: "P80U", color: "黑色", branch: "北京分公司", material: "P80U 8+256G", warehouse: "XX代管仓", warehouseAddr: "XX路XX号", oldRowStatus: "新建" });
+        modalOldRows.push({ sn: s, recvAddr: "", oldInNo: "", customer: "", store: "", reason: "", saleDate: "", returnDate: "", logisticsNo: "", orderNo: "", brand: "华为", model: "P80U", color: "黑色", branch: "北京分公司", project: "P80U鸿蒙换机项目", material: "P80U 8+256G", warehouse: "XX代管仓", warehouseAddr: "XX路XX号", oldRowStatus: "新建" });
       });
       renderOldRows(true);
       alert("上传图片识别完成，已导入 " + recognized.length + " 条串码");
@@ -1696,7 +1699,7 @@
       if (!addr) return;
       var arr = addr.split(/[,\n\s]+/).filter(Boolean);
       arr.forEach(function (a) {
-        modalOldRows.push({ recvAddr: a, sn: "", orderNo: "", store: "", reason: "", saleDate: "", returnDate: "", logisticsNo: "", brand: "华为", model: "P80U", color: "黑色", branch: "北京分公司", material: "P80U 8+256G", warehouse: "XX代管仓", warehouseAddr: "XX路XX号", oldRowStatus: "新建" });
+        modalOldRows.push({ recvAddr: a, sn: "", orderNo: "", store: "", reason: "", saleDate: "", returnDate: "", logisticsNo: "", brand: "华为", model: "P80U", color: "黑色", branch: "北京分公司", project: "P80U鸿蒙换机项目", material: "P80U 8+256G", warehouse: "XX代管仓", warehouseAddr: "XX路XX号", oldRowStatus: "新建" });
       });
       renderOldRows(true);
       alert("地址导入完成，已导入 " + arr.length + " 条收货信息");
@@ -1718,6 +1721,7 @@
       { title: "行号", width: 50, get: function (d, i) { return i + 1; } },
       { title: "IMEI1/IMEI2/SN", width: 150, get: function (d) { return d.sn || ""; } },
       { title: "物料描述", width: 180, get: function (d) { return d.material || ""; } },
+      { title: "项目", width: 110, get: function (d) { return d.project || ""; } },
       { title: "换机类型", width: 110, get: function (d) { return getNewRowOfOld(d).type || ""; } },
       { title: "入库单号", width: 110, get: function (d) { return d.oldInNo || ""; } },
       { title: "入库状态", width: 80, get: function (d) { return d.oldRowStatus || "新建"; } },
